@@ -455,7 +455,7 @@ function addLineToWidget(mainStack, type, replacedText, indentLevel, number_str,
         const isBold = (isFirstLine && !SHOW_FIRSTLINE_AS_PLAINTEXT) || ['h1', 'h2', 'h3'].includes(type[0]) || textType === 'bold';
         const isItalic = textType === 'italic';
         const isURL = textType === 'url';
-        const indentWidth = USE_FULL_WIDTH_CHARS ? 4 : 2;
+        const indentWidth = 2;
         
         const maxLineWidth = MAX_LINE_WIDTH - (indentLevel * indentWidth) - listMarkerWidth;
         const fullWidthCharSize = getWidgetConfigByFamily().fullWidthCharSize;
