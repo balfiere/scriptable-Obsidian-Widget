@@ -99,18 +99,27 @@ const CONFIG = {
 //=============================================================================
 
 const iCloud = FileManager.iCloud();
-const fileName_runsInApp = 'test'; // File name to display when run from within the Scriptable app
 
-// Get the target note name from the widget parameter. Use a test file name if no parameter is provided.
-const noteName = config.runsInWidget ? args.widgetParameter : fileName_runsInApp;
+// let the widget parameter be the date format of the daily note's file name
+// default format is yyyy-MM-dd
+let format = args.widgetParameter || "yyyy-MM-dd";
 
-const bookmarkedFolderName = 'note'; // Set the folder name configured in File Bookmarks here
+let now = new Date();
+let formatter = new DateFormatter();
+formatter.locale = "en_US";
+formatter.dateFormat = format;
+let today = formatter.string(now);
+
+let noteName = today;
+
+const bookmarkedFolderName = 'daily notes'; // Set the folder name configured in File Bookmarks here
 const vaultPath = iCloud.bookmarkedPath(bookmarkedFolderName);
 const targetNoteName = `${noteName}.md`;
 const targetNotePath = `${vaultPath}/${targetNoteName}`;
 
 // URL scheme for the Obsidian note to open when the widget is tapped
-const targetNoteUrl = `obsidian://open?vault=${encodeURIComponent(bookmarkedFolderName)}&file=${encodeURIComponent(noteName)}`;
+// const targetNoteUrl = `obsidian://open?vault=${encodeURIComponent(bookmarkedFolderName)}&file=${encodeURIComponent(noteName)}`;
+const targetNoteUrl = `obsidian://daily`;
 
 //=============================================================================
 // 3. Main Execution
