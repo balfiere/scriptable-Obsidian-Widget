@@ -25,6 +25,7 @@ const LIGHT_BACKGROUND_COLOR = 'FFFFFF';
 // Widget background image
 const BACKGROUND_IMAGE = false;
 const BACKGROUND_IMAGE_NAME = 'image.jpg';
+const BACKGROUND_IMAGE_COLOR = 'default'; // 'default', 'light' or 'dark'. If 'default', the text color will be dynamic, changing based on the device's light or dark mode. If 'dark', the text color will be light (as if it were in dark mode). If 'light', the text color will be dark (as if it were in light mode).
 
 // Color and opacity for the first line items
 const FIRST_LINE_COLOR_LIGHT = '#0088FF';// 
@@ -50,17 +51,17 @@ let H3_COUNT = 0;   // Count the number of h3 headings
 // Object to centrally manage style information for each element
 const CONFIG = {
     // Style for each text type
-    h1:     { fontSizeScale: 1.3, color_light: Color.black(), color_dark: Color.white() },
-    h2:     { fontSizeScale: 1.2, color_light: Color.black(), color_dark: Color.white() },
-    h3:     { fontSizeScale: 1.1, color_light: Color.black(), color_dark: Color.white() },
-    todo:   { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
-    done:   { fontSizeScale: 1,   color_light: Color.darkGray(), color_dark: Color.lightGray() },
-    cancelled:   { fontSizeScale: 1,   color_light: Color.lightGray(), color_dark: Color.darkGray() },
-    forwarded: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
-    inprogress: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
-    bullet: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
-    number: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
-    text:   { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
+    h1:     { fontSizeScale: 1.3, color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    h2:     { fontSizeScale: 1.2, color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    h3:     { fontSizeScale: 1.1, color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    todo:   { fontSizeScale: 1,   color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    done:   { fontSizeScale: 1, color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.lightGray() : Color.darkGray(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.darkGray() : Color.lightGray() },
+    cancelled:   { fontSizeScale: 1, color_light: BACKGROUND_IMAGE_COLOR === 'light' ? Color.darkGray() : Color.lightGray(), color_dark: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.lightGray() : Color.darkGray() },
+    forwarded: { fontSizeScale: 1,   color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    inprogress: { fontSizeScale: 1,   color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    bullet: { fontSizeScale: 1,   color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    number: { fontSizeScale: 1,   color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
+    text:   { fontSizeScale: 1,   color_light: BACKGROUND_IMAGE_COLOR === 'dark' ? Color.white() : Color.black(), color_dark: BACKGROUND_IMAGE_COLOR === 'light' ? Color.black() : Color.white() },
     bold:   { fontSizeScale: 1 },
     italic: { fontSizeScale: 1 },
     url:    {
