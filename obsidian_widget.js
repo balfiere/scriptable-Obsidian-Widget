@@ -128,19 +128,22 @@ const targetNoteUrl = `obsidian://daily`;
 // Async function to execute the main process
 (async () => {
     // If the widget parameter is not set, display an error message and exit
-    if (!args.widgetParameter && config.runsInWidget) {
-        const message = ['Widget parameter is not set.', 'Please enter the filename in the Parameter of the widget settings.'];
-        const errorWidget = handleError(message);
-        Script.setWidget(errorWidget);
-        return;
-    }
+    // if (!args.widgetParameter && config.runsInWidget) {
+    //     const message = ['Widget parameter is not set.', 'Please enter the filename in the Parameter of the widget settings.'];
+    //     const errorWidget = handleError(message);
+    //     Script.setWidget(errorWidget);
+    //     return;
+    // }
 
-    // If the target note file does not exist, display an error message and exit
+    // If the target note file does not exist, try to create it using obsidian's uri. if failed, display an error message and exit
     if (!iCloud.fileExists(targetNotePath)) {
-        const message = [`Note not found:`, `${targetNoteName}`];
-        const errorWidget = handleError(message);
-        Script.setWidget(errorWidget);
-        return;
+        let success = Safari.open("obsidian://daily");
+        if (!success) {
+            const message = [`Note not found:`, `${targetNoteName}`, " and couldn't be created."];
+            const errorWidget = handleError(message);
+            Script.setWidget(errorWidget);
+            return;
+        }
     }
 
     // Read data from the note file and generate the widget
