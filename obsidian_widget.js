@@ -11,7 +11,7 @@ const isPhone = true; // Specify the device (true: iPhone, false: iPad)
 const USE_FULL_WIDTH_CHARS = false; // Set to true if your note primarily uses full-width characters like Japanese, Chinese, or Korean. This adjusts line wrapping calculations.
 const FONT_SIZE = 12; // Font size
 const LINE_SPACING = 2; // Line spacing
-const START_STRING = '### To Do'; // Content before this string will not be displayed in the widget
+const START_STRING = '### To Do'; // Content before this string will not be displayed in the widget. If empty, start from the first line after the frontmatter
 const PARTITION_STRING = '### What I Accomplished Today'; // This string and its following content will not be displayed in the widget
 const SHOW_FIRSTLINE_AS_PLAINTEXT = false; // Whether to display the first line as plain text (if false, special styles are applied)
 const SHOW_FILENAME_ON_FIRSTLINE = true; // Whether to display the file name on the first line
@@ -23,7 +23,7 @@ const DARK_BACKGROUND_COLOR = '1C1C1E';//
 const LIGHT_BACKGROUND_COLOR = 'FFFFFF';
 
 // Widget background image
-const BACKGROUND_IMAGE = true;
+const BACKGROUND_IMAGE = false;
 const BACKGROUND_IMAGE_NAME = 'image.jpg';
 
 // Color and opacity for the first line items
@@ -54,6 +54,10 @@ const CONFIG = {
     h2:     { fontSizeScale: 1.2, color_light: Color.black(), color_dark: Color.white() },
     h3:     { fontSizeScale: 1.1, color_light: Color.black(), color_dark: Color.white() },
     todo:   { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
+    done:   { fontSizeScale: 1,   color_light: Color.darkGray(), color_dark: Color.lightGray() },
+    cancelled:   { fontSizeScale: 1,   color_light: Color.lightGray(), color_dark: Color.darkGray() },
+    forwarded: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
+    inprogress: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
     bullet: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
     number: { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
     text:   { fontSizeScale: 1,   color_light: Color.black(), color_dark: Color.white() },
@@ -70,6 +74,22 @@ const CONFIG = {
     },
     // Style for each image/icon
     todoImage: {
+        topPadding: 0.7, bottomPadding: 0, rightMargin: 2, leftMargin: 0, imageSizeScale: 1.1,
+        color_light: Color.lightGray(), color_dark: Color.darkGray()
+    },
+    doneImage: {
+        topPadding: 0.7, bottomPadding: 0, rightMargin: 2, leftMargin: 0, imageSizeScale: 1.1,
+        color_light: Color.green(), color_dark: Color.green()
+    },
+    cancelledImage: {
+        topPadding: 0.7, bottomPadding: 0, rightMargin: 2, leftMargin: 0, imageSizeScale: 1.1,
+        color_light: Color.darkGray(), color_dark: Color.darkGray()
+    },
+    forwardedImage: {
+        topPadding: 0.7, bottomPadding: 0, rightMargin: 2, leftMargin: 0, imageSizeScale: 1.1,
+        color_light: Color.lightGray(), color_dark: Color.lightGray()
+    },
+    inprogressImage: {
         topPadding: 0.7, bottomPadding: 0, rightMargin: 2, leftMargin: 0, imageSizeScale: 1.1,
         color_light: Color.lightGray(), color_dark: Color.darkGray()
     },
@@ -319,15 +339,18 @@ function extractMemoData(noteString) {
 
     // Add the file name to the first line based on the setting
     if (SHOW_FILENAME_ON_FIRSTLINE) {
-        filteredLines.unshift(noteName);
+        // filteredLines.unshift(noteName);
+        relevantLines.unshift(noteName);
     }
     
     // If all filtered lines are empty, consider it as no text
-    if (filteredLines.every(line => line.trim() === '')) {
+    // if (filteredLines.every(line => line.trim() === '')) {
+    if (relevantLines.every(line => line.trim() === '')) {
         isTextExist = false;
     }
 
-    return { memos: filteredLines, isTextExist, numberOfTasks };
+    // return { memos: filteredLines, isTextExist, numberOfTasks };
+    return { memos: relevantLines, isTextExist, numberOfTasks };
 }
 
 /**
@@ -339,6 +362,10 @@ function parseMemoLine(memoLine) {
     const regexTab = /^\t+/;
     const regexHeading = /^(#+) /;
     const regexTodo = /^- \[ \] /;
+    const regexDone = /^- \[x\] /;
+    const regexCancelled = /^- \[-\] /;
+    const regexForwarded = /^- \[>\] /;
+    const regexInProgress = /^- \[\/\] /;
     const regexBullet = /^(?:-|\*)\s/;
     const regexNumber = /^\d+\.\s/;
     
@@ -358,6 +385,18 @@ function parseMemoLine(memoLine) {
     } else if (regexTodo.test(textWithoutIndent)) {
         type.push('todo');
         replacedText.push(textWithoutIndent.replace(regexTodo, ''));
+    } else if (regexDone.test(textWithoutIndent)) {
+        type.push('done');
+        replacedText.push(textWithoutIndent.replace(regexDone, ''));
+    } else if (regexCancelled.test(textWithoutIndent)) {
+        type.push('cancelled');
+        replacedText.push(textWithoutIndent.replace(regexCancelled, ''));
+    } else if (regexForwarded.test(textWithoutIndent)) {
+        type.push('forwarded');
+        replacedText.push(textWithoutIndent.replace(regexForwarded, ''));
+    } else if (regexInProgress.test(textWithoutIndent)) {
+        type.push('inprogress');
+        replacedText.push(textWithoutIndent.replace(regexInProgress, ''));
     } else if (regexBullet.test(textWithoutIndent)) {
         type.push('bullet');
         replacedText.push(textWithoutIndent.replace(regexBullet, ''));
@@ -464,7 +503,7 @@ function addLineToWidget(mainStack, type, replacedText, indentLevel, number_str,
 
     // Add list markers (checkbox, bullet, number)
     let listMarkerWidth = 0;
-    if (['todo', 'bullet', 'number'].includes(type[0])) {
+    if (['todo', 'done', 'cancelled', 'forwarded', 'inprogress', 'bullet', 'number'].includes(type[0])) {
         listMarkerWidth = 4; // Reserve width for the marker (approximate half-width characters)
         addListMarker(lineStack, CONFIG[`${type[0]}Image`], type[0], number_str);
     }
@@ -624,6 +663,22 @@ function addListMarker(stack, config, type, listNumber) {
             const todoImage = SFSymbol.named('circle').image;
             //const todoImage = storeImage('square.png'); // Use this for a square checkbox
             addImage(stack, todoImage, config);
+            break;
+        case 'done':
+            const doneImage = SFSymbol.named('checkmark.circle').image;
+            addImage(stack, doneImage, config);
+            break;
+        case 'cancelled':
+            const cancelledImage = SFSymbol.named('xmark.circle').image;
+            addImage(stack, cancelledImage, config);
+            break;
+        case 'forwarded':
+            const forwardedImage = SFSymbol.named('chevron.right.circle').image;
+            addImage(stack, forwardedImage, config);
+            break;
+        case 'inprogress':
+            const inprogressImage = SFSymbol.named('circle.righthalf.fill').image;
+            addImage(stack, inprogressImage, config);
             break;
         case 'bullet':
             const bulletImage = storeImage('bullet-point.png');
