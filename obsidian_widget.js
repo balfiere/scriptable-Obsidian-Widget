@@ -21,6 +21,10 @@ const SHOW_TASK_NUMBER = true; // Whether to display the number of incomplete ta
 const DARK_BACKGROUND_COLOR = '1C1C1E';// 
 const LIGHT_BACKGROUND_COLOR = 'FFFFFF';
 
+// Widget background image
+const BACKGROUND_IMAGE = true;
+const BACKGROUND_IMAGE_NAME = 'image.jpg';
+
 // Color and opacity for the first line items
 const FIRST_LINE_COLOR_LIGHT = '#0088FF';// 
 const FIRST_LINE_COLOR_DARK = '#0091FF';
@@ -189,7 +193,14 @@ function createWidget(memos, noteUrl, numberOfTasks) {
     const widget = new ListWidget();
     widget.setPadding(15, 18, 15, 12);
     widget.url = noteUrl;
-    widget.backgroundColor = Color.dynamic(new Color(LIGHT_BACKGROUND_COLOR), new Color(DARK_BACKGROUND_COLOR));
+
+    if (BACKGROUND_IMAGE === false) {
+        widget.backgroundColor = Color.dynamic(new Color(LIGHT_BACKGROUND_COLOR), new Color(DARK_BACKGROUND_COLOR));
+    } else {
+        const directoryName = 'Images'; // The folder where images are stored
+        const path = iCloud.joinPath(iCloud.joinPath(iCloud.documentsDirectory(), directoryName), BACKGROUND_IMAGE_NAME);
+        widget.backgroundImage = iCloud.readImage(path);
+    }
 
     const mainStack = widget.addStack();
     mainStack.layoutVertically();
