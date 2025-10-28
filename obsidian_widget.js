@@ -11,7 +11,8 @@ const isPhone = true; // Specify the device (true: iPhone, false: iPad)
 const USE_FULL_WIDTH_CHARS = false; // Set to true if your note primarily uses full-width characters like Japanese, Chinese, or Korean. This adjusts line wrapping calculations.
 const FONT_SIZE = 12; // Font size
 const LINE_SPACING = 2; // Line spacing
-const PARTITION_STRING = '---'; // Content after this string will not be displayed in the widget
+const START_STRING = '### To Do'; // Content before this string will not be displayed in the widget
+const PARTITION_STRING = '### What I Accomplished Today'; // This string and its following content will not be displayed in the widget
 const SHOW_FIRSTLINE_AS_PLAINTEXT = false; // Whether to display the first line as plain text (if false, special styles are applied)
 const SHOW_FILENAME_ON_FIRSTLINE = true; // Whether to display the file name on the first line
 const SHOW_TASK_NUMBER = true; // Whether to display the number of incomplete tasks
@@ -291,6 +292,14 @@ function extractMemoData(noteString) {
     if (lines[0] === FRONTMATTER_STRING) {
         lines.shift();
         sliceIndex = lines.indexOf(FRONTMATTER_STRING) + 1;
+    }
+
+    // Keep removing lines until the START_STRING is found
+    if (START_STRING !== '' && lines[sliceIndex] !== START_STRING) {
+        while (lines[sliceIndex] !== START_STRING) {
+            lines.shift();
+            sliceIndex++;
+        }
     }
     
     const contentLines = lines.slice(sliceIndex);
